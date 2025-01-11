@@ -1,10 +1,10 @@
-require_relative './helpers'
+require_relative "helpers"
 
 module AnnotateRoutes
   class HeaderGenerator
-    PREFIX = '== Route Map'.freeze
-    PREFIX_MD = '## Route Map'.freeze
-    HEADER_ROW = ['Prefix', 'Verb', 'URI Pattern', 'Controller#Action'].freeze
+    PREFIX = "== Route Map".freeze
+    PREFIX_MD = "## Route Map".freeze
+    HEADER_ROW = ["Prefix", "Verb", "URI Pattern", "Controller#Action"].freeze
 
     class << self
       def generate(options = {})
@@ -16,12 +16,12 @@ module AnnotateRoutes
       private
 
       def routes_map(options)
-        result = `rake routes`.chomp("\n").split(/\n/, -1)
+        result = `rake routes`.chomp("\n").split("\n", -1)
 
         # In old versions of Rake, the first line of output was the cwd.  Not so
         # much in newer ones.  We ditch that line if it exists, and if not, we
         # keep the line around.
-        result.shift if result.first =~ %r{^\(in \/}
+        result.shift if %r{^\(in /}.match?(result.first)
 
         ignore_routes = options[:ignore_routes]
         regexp_for_ignoring_routes = ignore_routes ? /#{ignore_routes}/ : nil
@@ -49,7 +49,7 @@ module AnnotateRoutes
       magic_comments_map.each do |magic_comment|
         out << magic_comment
       end
-      out << '' if magic_comments_map.any?
+      out << "" if magic_comments_map.any?
 
       out << comment(options[:wrapper_open]) if options[:wrapper_open]
 
@@ -63,12 +63,12 @@ module AnnotateRoutes
         max = maxs.map(&:max).compact.max
 
         out << comment(content(HEADER_ROW, maxs))
-        out << comment(content(['-' * max, '-' * max, '-' * max, '-' * max], maxs))
+        out << comment(content(["-" * max, "-" * max, "-" * max, "-" * max], maxs))
       else
         out << comment(content(contents_without_magic_comments[0], maxs))
       end
 
-      out += contents_without_magic_comments[1..-1].map { |line| comment(content(markdown? ? line.split(' ') : line, maxs)) }
+      out += contents_without_magic_comments[1..-1].map { |line| comment(content(markdown? ? line.split(" ") : line, maxs)) }
       out << comment(options[:wrapper_close]) if options[:wrapper_close]
 
       out
@@ -78,9 +78,9 @@ module AnnotateRoutes
 
     attr_reader :options, :routes_map
 
-    def comment(row = '')
-      if row == ''
-        '#'
+    def comment(row = "")
+      if row == ""
+        "#"
       else
         "# #{row}"
       end
@@ -89,12 +89,12 @@ module AnnotateRoutes
     def content(line, maxs)
       return line.rstrip unless markdown?
 
-      line.each_with_index.map { |elem, index| format_line_element(elem, maxs, index) }.join(' | ')
+      line.each_with_index.map { |elem, index| format_line_element(elem, maxs, index) }.join(" | ")
     end
 
     def format_line_element(elem, maxs, index)
       min_length = maxs.map { |arr| arr[index] }.max || 0
-      format("%-#{min_length}.#{min_length}s", elem.tr('|', '-'))
+      format("%-#{min_length}.#{min_length}s", elem.tr("|", "-"))
     end
 
     def markdown?
@@ -103,10 +103,10 @@ module AnnotateRoutes
 
     def timestamp_if_required(time = Time.now)
       if options[:timestamp]
-        time_formatted = time.strftime('%Y-%m-%d %H:%M')
+        time_formatted = time.strftime("%Y-%m-%d %H:%M")
         " (Updated #{time_formatted})"
       else
-        ''
+        ""
       end
     end
   end

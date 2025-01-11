@@ -1,9 +1,9 @@
-module Annotate
+module Annotated
   module Constants
-    TRUE_RE = /^(true|t|yes|y|1)$/i.freeze
+    TRUE_RE = /^(true|t|yes|y|1)$/i
 
     ##
-    # The set of available options to customize the behavior of Annotate.
+    # The set of available options to customize the behavior of Annotated.
     #
     POSITION_OPTIONS = [
       :position_in_routes, :position_in_class, :position_in_test,

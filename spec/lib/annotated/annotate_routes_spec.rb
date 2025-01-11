@@ -1,27 +1,29 @@
-require_relative '../../spec_helper'
-require 'annotate/annotate_routes'
+require_relative "../../spec_helper"
+require "annotated/annotate_routes"
 
 describe AnnotateRoutes do
-  ROUTE_FILE = 'config/routes.rb'.freeze
+  ROUTE_FILE = "config/routes.rb".freeze
 
   MESSAGE_ANNOTATED = "#{ROUTE_FILE} was annotated.".freeze
   MESSAGE_UNCHANGED = "#{ROUTE_FILE} was not changed.".freeze
   MESSAGE_NOT_FOUND = "#{ROUTE_FILE} could not be found.".freeze
   MESSAGE_REMOVED = "Annotations were removed from #{ROUTE_FILE}.".freeze
 
-  MAGIC_COMMENTS = [
-    '# encoding: UTF-8',
-    '# coding: UTF-8',
-    '# -*- coding: UTF-8 -*-',
-    '#encoding: utf-8',
-    '# encoding: utf-8',
-    '# -*- encoding : utf-8 -*-',
-    "# encoding: utf-8\n# frozen_string_literal: true",
-    "# frozen_string_literal: true\n# encoding: utf-8",
-    '# frozen_string_literal: true',
-    '#frozen_string_literal: false',
-    '# -*- frozen_string_literal : true -*-'
-  ].freeze unless const_defined?(:MAGIC_COMMENTS)
+  unless const_defined?(:MAGIC_COMMENTS)
+    MAGIC_COMMENTS = [
+      "# encoding: UTF-8",
+      "# coding: UTF-8",
+      "# -*- coding: UTF-8 -*-",
+      "#encoding: utf-8",
+      "# encoding: utf-8",
+      "# -*- encoding : utf-8 -*-",
+      "# encoding: utf-8\n# frozen_string_literal: true",
+      "# frozen_string_literal: true\n# encoding: utf-8",
+      "# frozen_string_literal: true",
+      "#frozen_string_literal: false",
+      "# -*- frozen_string_literal : true -*-"
+    ].freeze
+  end
 
   let :stubs do
     {}
@@ -31,13 +33,13 @@ describe AnnotateRoutes do
     double(File, stubs)
   end
 
-  describe '.do_annotations' do
+  describe ".do_annotations" do
     context 'When "config/routes.rb" does not exist' do
       before :each do
         expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(false).once
       end
 
-      it 'does not annotates any file' do
+      it "does not annotates any file" do
         expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_NOT_FOUND)
 
         AnnotateRoutes.do_annotations
@@ -49,12 +51,12 @@ describe AnnotateRoutes do
         expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(true).once
         expect(File).to receive(:read).with(ROUTE_FILE).and_return(route_file_content).once
 
-        expect(AnnotateRoutes::HeaderGenerator).to receive(:`).with('rake routes').and_return(rake_routes_result).once
+        expect(AnnotateRoutes::HeaderGenerator).to receive(:`).with("rake routes").and_return(rake_routes_result).once
       end
 
-      context 'When the result of `rake routes` is present' do
-        context 'When the result of `rake routes` does not contain Rake version' do
-          context 'When the file does not contain magic comment' do
+      context "When the result of `rake routes` is present" do
+        context "When the result of `rake routes` does not contain Rake version" do
+          context "When the file does not contain magic comment" do
             let :rake_routes_result do
               <<-EOS
                                       Prefix Verb       URI Pattern                                               Controller#Action
@@ -65,11 +67,11 @@ describe AnnotateRoutes do
             end
 
             let :route_file_content do
-              ''
+              ""
             end
 
-            context 'When the file does not contain annotation yet' do
-              context 'When no option is passed' do
+            context "When the file does not contain annotation yet" do
+              context "When no option is passed" do
                 let :expected_result do
                   <<~EOS
 
@@ -82,8 +84,8 @@ describe AnnotateRoutes do
                   EOS
                 end
 
-                it 'annotates normally' do
-                  expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                it "annotates normally" do
+                  expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
                   expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -105,8 +107,8 @@ describe AnnotateRoutes do
                   EOS
                 end
 
-                it 'annotates in Markdown format' do
-                  expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                it "annotates in Markdown format" do
+                  expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
                   expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -129,18 +131,18 @@ describe AnnotateRoutes do
                   EOS
                 end
 
-                it 'annotates and wraps annotation with specified words' do
-                  expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                it "annotates and wraps annotation with specified words" do
+                  expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
                   expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                  AnnotateRoutes.do_annotations(wrapper_open: 'START', wrapper_close: 'END')
+                  AnnotateRoutes.do_annotations(wrapper_open: "START", wrapper_close: "END")
                 end
               end
             end
           end
 
-          context 'When the file contains magic comments' do
+          context "When the file contains magic comments" do
             MAGIC_COMMENTS.each do |magic_comment|
               describe "magic comment: #{magic_comment.inspect}" do
                 let :route_file_content do
@@ -158,8 +160,8 @@ describe AnnotateRoutes do
                   EOS
                 end
 
-                context 'When the file does not contain annotation yet' do
-                  context 'When no option is passed' do
+                context "When the file does not contain annotation yet" do
+                  context "When no option is passed" do
                     let :expected_result do
                       <<~EOS
                         #{magic_comment}
@@ -173,8 +175,8 @@ describe AnnotateRoutes do
                       EOS
                     end
 
-                    it 'annotates normally' do
-                      expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                    it "annotates normally" do
+                      expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                       expect(mock_file).to receive(:puts).with(expected_result).once
                       expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -197,8 +199,8 @@ describe AnnotateRoutes do
                       EOS
                     end
 
-                    it 'annotates in Markdown format' do
-                      expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                    it "annotates in Markdown format" do
+                      expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                       expect(mock_file).to receive(:puts).with(expected_result).once
                       expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -222,12 +224,12 @@ describe AnnotateRoutes do
                       EOS
                     end
 
-                    it 'annotates and wraps annotation with specified words' do
-                      expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                    it "annotates and wraps annotation with specified words" do
+                      expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                       expect(mock_file).to receive(:puts).with(expected_result).once
                       expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                      AnnotateRoutes.do_annotations(wrapper_open: 'START', wrapper_close: 'END')
+                      AnnotateRoutes.do_annotations(wrapper_open: "START", wrapper_close: "END")
                     end
                   end
                 end
@@ -236,8 +238,8 @@ describe AnnotateRoutes do
           end
         end
 
-        context 'When the result of `rake routes` contains Rake version' do
-          context 'with older Rake versions' do
+        context "When the result of `rake routes` contains Rake version" do
+          context "with older Rake versions" do
             let :rake_routes_result do
               <<~EOS.chomp
                 (in /bad/line)
@@ -245,7 +247,7 @@ describe AnnotateRoutes do
               EOS
             end
 
-            context 'When the route file does not end with an empty line' do
+            context "When the route file does not end with an empty line" do
               let :route_file_content do
                 <<~EOS.chomp
                   ActionController::Routing...
@@ -264,8 +266,8 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'annotates with an empty line' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "annotates with an empty line" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -273,7 +275,7 @@ describe AnnotateRoutes do
               end
             end
 
-            context 'When the route file ends with an empty line' do
+            context "When the route file ends with an empty line" do
               let :route_file_content do
                 <<~EOS
                   ActionController::Routing...
@@ -292,8 +294,8 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'annotates without an empty line' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "annotates without an empty line" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -302,7 +304,7 @@ describe AnnotateRoutes do
             end
           end
 
-          context 'with newer Rake versions' do
+          context "with newer Rake versions" do
             let :rake_routes_result do
               <<~EOS.chomp
                 another good line
@@ -310,8 +312,8 @@ describe AnnotateRoutes do
               EOS
             end
 
-            context 'When the route file does not end with an empty line' do
-              context 'When no option is passed' do
+            context "When the route file does not end with an empty line" do
+              context "When no option is passed" do
                 let :route_file_content do
                   <<~EOS.chomp
                     ActionController::Routing...
@@ -331,8 +333,8 @@ describe AnnotateRoutes do
                   EOS
                 end
 
-                it 'annotates with an empty line' do
-                  expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                it "annotates with an empty line" do
+                  expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                   expect(mock_file).to receive(:puts).with(expected_result).once
                   expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -341,7 +343,7 @@ describe AnnotateRoutes do
               end
             end
 
-            context 'When the route file ends with an empty line' do
+            context "When the route file ends with an empty line" do
               let :route_file_content do
                 <<~EOS
                   ActionController::Routing...
@@ -361,8 +363,8 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'annotates without an empty line' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "annotates without an empty line" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -382,8 +384,8 @@ describe AnnotateRoutes do
                 /ActionController::Routing...\nfoo\n\n# == Route Map \(Updated \d{4}-\d{2}-\d{2} \d{2}:\d{2}\)\n#\n# another good line\n# good line\n/
               end
 
-              it 'annotates with the timestamp and an empty line' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "annotates with the timestamp and an empty line" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -394,18 +396,18 @@ describe AnnotateRoutes do
         end
       end
 
-      context 'When the result of `rake routes` is blank' do
+      context "When the result of `rake routes` is blank" do
         let :rake_routes_result do
-          ''
+          ""
         end
 
-        context 'When the file does not contain magic comment' do
-          context 'When the file does not contain annotation yet' do
+        context "When the file does not contain magic comment" do
+          context "When the file does not contain annotation yet" do
             let :route_file_content do
-              ''
+              ""
             end
 
-            context 'When no option is specified' do
+            context "When no option is specified" do
               let :expected_result do
                 <<~EOS
 
@@ -414,8 +416,8 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'inserts annotations' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "inserts annotations" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
@@ -432,12 +434,12 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'inserts annotations' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "inserts annotations" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations(ignore_routes: 'my_route')
+                AnnotateRoutes.do_annotations(ignore_routes: "my_route")
               end
             end
 
@@ -449,18 +451,18 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'inserts annotations' do
-                expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+              it "inserts annotations" do
+                expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                 expect(mock_file).to receive(:puts).with(expected_result).once
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                AnnotateRoutes.do_annotations(position_in_routes: 'top')
+                AnnotateRoutes.do_annotations(position_in_routes: "top")
               end
             end
           end
 
-          context 'When the file already contains annotation' do
-            context 'When no option is specified' do
+          context "When the file already contains annotation" do
+            context "When no option is specified" do
               let :route_file_content do
                 <<~EOS
 
@@ -469,8 +471,8 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              it 'should skip annotations if file does already contain annotation' do
-                expect(File).not_to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file)
+              it "should skip annotations if file does already contain annotation" do
+                expect(File).not_to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file)
                 expect(mock_file).not_to receive(:puts)
                 expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_UNCHANGED).once
 
@@ -480,7 +482,7 @@ describe AnnotateRoutes do
           end
         end
 
-        context 'When the file contains magic comments' do
+        context "When the file contains magic comments" do
           MAGIC_COMMENTS.each do |magic_comment|
             describe "magic comment: #{magic_comment.inspect}" do
               let :route_file_content do
@@ -490,7 +492,7 @@ describe AnnotateRoutes do
                 EOS
               end
 
-              context 'When the file does not contain annotation yet' do
+              context "When the file does not contain annotation yet" do
                 context 'When the option "position_in_routes" is specified as "top"' do
                   let :expected_result do
                     <<~EOS
@@ -503,12 +505,12 @@ describe AnnotateRoutes do
                     EOS
                   end
 
-                  it 'leaves magic comment on top and adds an empty line between magic comment and annotation' do
-                    expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                  it "leaves magic comment on top and adds an empty line between magic comment and annotation" do
+                    expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                     expect(mock_file).to receive(:puts).with(expected_result).once
                     expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                    AnnotateRoutes.do_annotations(position_in_routes: 'top')
+                    AnnotateRoutes.do_annotations(position_in_routes: "top")
                   end
                 end
 
@@ -523,17 +525,17 @@ describe AnnotateRoutes do
                     EOS
                   end
 
-                  it 'leaves magic comment on top and adds an empty line between magic comment and annotation' do
-                    expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+                  it "leaves magic comment on top and adds an empty line between magic comment and annotation" do
+                    expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
                     expect(mock_file).to receive(:puts).with(expected_result).once
                     expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_ANNOTATED).once
 
-                    AnnotateRoutes.do_annotations(position_in_routes: 'bottom')
+                    AnnotateRoutes.do_annotations(position_in_routes: "bottom")
                   end
                 end
               end
 
-              context 'When the file already contains annotation' do
+              context "When the file already contains annotation" do
                 let :route_file_content do
                   <<~EOS
                     #{magic_comment}
@@ -543,8 +545,8 @@ describe AnnotateRoutes do
                   EOS
                 end
 
-                it 'skips annotations' do
-                  expect(File).not_to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file)
+                it "skips annotations" do
+                  expect(File).not_to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file)
                   expect(mock_file).not_to receive(:puts)
                   expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_UNCHANGED).once
 
@@ -557,7 +559,7 @@ describe AnnotateRoutes do
       end
     end
 
-    describe 'frozen option' do
+    describe "frozen option" do
       let :aborted_message do
         "annotate error. #{ROUTE_FILE} needs to be updated, but annotate was run with `--frozen`."
       end
@@ -575,20 +577,20 @@ describe AnnotateRoutes do
         expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(true).once
         expect(File).to receive(:read).with(ROUTE_FILE).and_return(route_file_content).once
 
-        expect(AnnotateRoutes::HeaderGenerator).to receive(:`).with('rake routes').and_return(rake_routes_result).once
+        expect(AnnotateRoutes::HeaderGenerator).to receive(:`).with("rake routes").and_return(rake_routes_result).once
       end
 
-      context 'when annotation does not exists' do
+      context "when annotation does not exists" do
         let :route_file_content do
-          ''
+          ""
         end
 
-        it 'aborts' do
+        it "aborts" do
           expect { AnnotateRoutes.do_annotations(frozen: true) }.to raise_error SystemExit, aborted_message
         end
       end
 
-      context 'when annotation exists but is not updated' do
+      context "when annotation exists but is not updated" do
         let :route_file_content do
           <<~EOS
             # == Route Map
@@ -599,12 +601,12 @@ describe AnnotateRoutes do
           EOS
         end
 
-        it 'aborts' do
+        it "aborts" do
           expect { AnnotateRoutes.do_annotations(frozen: true) }.to raise_error SystemExit, aborted_message
         end
       end
 
-      context 'when annotation exists and is already updated' do
+      context "when annotation exists and is already updated" do
         let :route_file_content do
           <<~EOS
             # == Route Map
@@ -616,21 +618,21 @@ describe AnnotateRoutes do
           EOS
         end
 
-        it 'does NOT abort' do
+        it "does NOT abort" do
           expect { AnnotateRoutes.do_annotations(frozen: true) }.not_to raise_error
         end
       end
     end
   end
 
-  describe '.remove_annotations' do
+  describe ".remove_annotations" do
     before :each do
       expect(File).to receive(:exist?).with(ROUTE_FILE).and_return(true).once
       expect(File).to receive(:read).with(ROUTE_FILE).and_return(route_file_content).once
-      expect(File).to receive(:open).with(ROUTE_FILE, 'wb').and_yield(mock_file).once
+      expect(File).to receive(:open).with(ROUTE_FILE, "wb").and_yield(mock_file).once
     end
 
-    context 'When trailing annotation exists' do
+    context "When trailing annotation exists" do
       let :route_file_content do
         <<~EOS
 
@@ -657,7 +659,7 @@ describe AnnotateRoutes do
         EOS
       end
 
-      it 'removes trailing annotation and trim trailing newlines, but leave leading newlines alone' do
+      it "removes trailing annotation and trim trailing newlines, but leave leading newlines alone" do
         expect(mock_file).to receive(:puts).with(expected_result).once
         expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_REMOVED).once
 
@@ -665,7 +667,7 @@ describe AnnotateRoutes do
       end
     end
 
-    context 'When prepended annotation exists' do
+    context "When prepended annotation exists" do
       let :route_file_content do
         <<~EOS
           # == Route Map
@@ -696,7 +698,7 @@ describe AnnotateRoutes do
         EOS
       end
 
-      it 'removes prepended annotation and trim leading newlines, but leave trailing newlines alone' do
+      it "removes prepended annotation and trim leading newlines, but leave trailing newlines alone" do
         expect(mock_file).to receive(:puts).with(expected_result).once
         expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_REMOVED).once
 
@@ -704,7 +706,7 @@ describe AnnotateRoutes do
       end
     end
 
-    context 'When custom comments are above route map' do
+    context "When custom comments are above route map" do
       let :route_file_content do
         <<~EOS
           # My comment
@@ -727,7 +729,7 @@ describe AnnotateRoutes do
         EOS
       end
 
-      it 'does not remove custom comments above route map' do
+      it "does not remove custom comments above route map" do
         expect(mock_file).to receive(:puts).with(expected_result).once
         expect(AnnotateRoutes).to receive(:puts).with(MESSAGE_REMOVED).once
 

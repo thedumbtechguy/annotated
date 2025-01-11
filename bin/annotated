@@ -1,0 +1,32 @@
+#!/usr/bin/env ruby
+
+unless File.exist?('./Rakefile') || File.exist?('./Gemfile')
+  abort 'Please run annotate from the root of the project.'
+end
+
+require 'rubygems'
+begin
+  require 'bundler'
+  Bundler.setup
+rescue StandardError
+end
+
+here = File.expand_path(File.dirname __FILE__)
+$LOAD_PATH << "#{here}/../lib"
+
+require 'annotated'
+require 'annotated/parser'
+
+Annotated.bootstrap_rake
+
+options_result = Annotated::Parser.parse(ARGV)
+
+exit if options_result[:exit]
+
+options = Annotated.setup_options(
+  is_rake: ENV['is_rake'] && !ENV['is_rake'].empty?
+)
+Annotated.eager_load(options) if Annotated::Helpers.include_models?
+
+AnnotatedModels.send(options_result[:target_action], options) if Annotated::Helpers.include_models?
+AnnotatedRoutes.send(options_result[:target_action], options) if Annotated::Helpers.include_routes?

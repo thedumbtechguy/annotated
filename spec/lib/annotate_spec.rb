@@ -1,9 +1,9 @@
-require_relative '../spec_helper'
+require_relative "../spec_helper"
 
-describe Annotate do
-  describe '.version' do
-    it 'has version' do
-      expect(Annotate.version).to be_instance_of(String)
+describe Annotated do
+  describe ".version" do
+    it "has version" do
+      expect(Annotated.version).to be_instance_of(String)
     end
   end
 end

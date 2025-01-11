@@ -1,21 +1,21 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
-require 'annotate/version'
-require 'annotate/annotate_models'
-require 'annotate/annotate_routes'
-require 'annotate/constants'
-require 'annotate/helpers'
+require "annotated/version"
+require "annotated/annotate_models"
+require "annotated/annotate_routes"
+require "annotated/constants"
+require "annotated/helpers"
 
 begin
   # ActiveSupport 3.x...
-  require 'active_support/hash_with_indifferent_access'
-  require 'active_support/core_ext/object/blank'
-rescue StandardError
+  require "active_support/hash_with_indifferent_access"
+  require "active_support/core_ext/object/blank"
+rescue
   # ActiveSupport 2.x...
-  require 'active_support/core_ext/hash/indifferent_access'
-  require 'active_support/core_ext/blank'
+  require "active_support/core_ext/hash/indifferent_access"
+  require "active_support/core_ext/blank"
 end
 
-module Annotate
+module Annotated
   ##
   # Set default values that can be overridden via environment variables.
   #
@@ -28,10 +28,10 @@ module Annotate
     Constants::ALL_ANNOTATE_OPTIONS.flatten.each do |key|
       if options.key?(key)
         default_value = if options[key].is_a?(Array)
-                          options[key].join(',')
-                        else
-                          options[key]
-                        end
+          options[key].join(",")
+        else
+          options[key]
+        end
       end
 
       default_value = ENV[key.to_s] unless ENV[key.to_s].blank?
@@ -44,29 +44,29 @@ module Annotate
   #
   def self.setup_options(options = {})
     Constants::POSITION_OPTIONS.each do |key|
-      options[key] = Annotate::Helpers.fallback(ENV[key.to_s], ENV['position'], 'before')
+      options[key] = Annotated::Helpers.fallback(ENV[key.to_s], ENV["position"], "before")
     end
     Constants::FLAG_OPTIONS.each do |key|
-      options[key] = Annotate::Helpers.true?(ENV[key.to_s])
+      options[key] = Annotated::Helpers.true?(ENV[key.to_s])
     end
     Constants::OTHER_OPTIONS.each do |key|
-      options[key] = !ENV[key.to_s].blank? ? ENV[key.to_s] : nil
+      options[key] = (!ENV[key.to_s].blank?) ? ENV[key.to_s] : nil
     end
     Constants::PATH_OPTIONS.each do |key|
-      options[key] = !ENV[key.to_s].blank? ? ENV[key.to_s].split(',') : []
+      options[key] = (!ENV[key.to_s].blank?) ? ENV[key.to_s].split(",") : []
     end
 
     options[:additional_file_patterns] ||= []
-    options[:additional_file_patterns] = options[:additional_file_patterns].split(',') if options[:additional_file_patterns].is_a?(String)
-    options[:model_dir] = ['app/models'] if options[:model_dir].empty?
+    options[:additional_file_patterns] = options[:additional_file_patterns].split(",") if options[:additional_file_patterns].is_a?(String)
+    options[:model_dir] = ["app/models"] if options[:model_dir].empty?
 
     options[:wrapper_open] ||= options[:wrapper]
     options[:wrapper_close] ||= options[:wrapper]
 
     # These were added in 2.7.0 but so this is to revert to old behavior by default
-    options[:exclude_scaffolds] = Annotate::Helpers.true?(ENV.fetch('exclude_scaffolds', 'true'))
-    options[:exclude_controllers] = Annotate::Helpers.true?(ENV.fetch('exclude_controllers', 'true'))
-    options[:exclude_helpers] = Annotate::Helpers.true?(ENV.fetch('exclude_helpers', 'true'))
+    options[:exclude_scaffolds] = Annotated::Helpers.true?(ENV.fetch("exclude_scaffolds", "true"))
+    options[:exclude_controllers] = Annotated::Helpers.true?(ENV.fetch("exclude_controllers", "true"))
+    options[:exclude_helpers] = Annotated::Helpers.true?(ENV.fetch("exclude_helpers", "true"))
 
     options
   end
@@ -74,7 +74,7 @@ module Annotate
   def self.load_tasks
     return if @tasks_loaded
 
-    Dir[File.join(File.dirname(__FILE__), 'tasks', '**/*.rake')].each do |rake|
+    Dir[File.join(File.dirname(__FILE__), "tasks", "**/*.rake")].each do |rake|
       load rake
     end
 
@@ -83,10 +83,10 @@ module Annotate
 
   def self.eager_load(options)
     load_requires(options)
-    require 'annotate/active_record_patch'
+    require "annotated/active_record_patch"
 
     if defined?(Rails::Application)
-      if Rails.version.split('.').first.to_i < 3
+      if Rails.version.split(".").first.to_i < 3
         Rails.configuration.eager_load_paths.each do |load_path|
           matcher = /\A#{Regexp.escape(load_path)}(.*)\.rb\Z/
           Dir.glob("#{load_path}/**/*.rb").sort.each do |file|
@@ -108,15 +108,15 @@ module Annotate
 
   def self.bootstrap_rake
     begin
-      require 'rake/dsl_definition'
-    rescue StandardError => e
+      require "rake/dsl_definition"
+    rescue => e
       # We might just be on an old version of Rake...
-      $stderr.puts e.message
+      warn e.message
       exit e.status_code
     end
-    require 'rake'
+    require "rake"
 
-    load './Rakefile' if File.exist?('./Rakefile')
+    load "./Rakefile" if File.exist?("./Rakefile")
     begin
       Rake::Task[:environment].invoke
     rescue
@@ -125,9 +125,9 @@ module Annotate
     unless defined?(Rails)
       # Not in a Rails project, so time to load up the parts of
       # ActiveSupport we need.
-      require 'active_support'
-      require 'active_support/core_ext/class/subclasses'
-      require 'active_support/core_ext/string/inflections'
+      require "active_support"
+      require "active_support/core_ext/class/subclasses"
+      require "active_support/core_ext/string/inflections"
     end
 
     load_tasks
@@ -143,3 +143,5 @@ module Annotate
     end
   end
 end
+
+# Annotate = Annotated unless defined?(Annotate)

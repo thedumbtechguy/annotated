@@ -1,4 +1,4 @@
-## Annotate (aka AnnotateModels)
+## Annotated (fork of Annotate aka AnnotateModels)
 
 [![Gem Version](https://badge.fury.io/rb/annotate.svg)](http://badge.fury.io/rb/annotate)
 [![Downloads count](https://img.shields.io/gem/dt/annotate.svg?style=flat)](https://rubygems.org/gems/annotate)
@@ -70,7 +70,7 @@ a) Running `rails g annotate:install` will overwrite your defaults with the anno
 b) In `lib/tasks/auto_annotate_models.rake` add the `models` key-value option:
 
 ```ruby
-    Annotate.set_defaults(
+    Annotated.set_defaults(
       ...
       'models'                      => 'true',
       ...
@@ -138,7 +138,7 @@ To remove routes.rb annotations:
 
 To automatically annotate every time you run `db:migrate`,
 either run `rails g annotate:install`
-or add `Annotate.load_tasks` to your `Rakefile`.
+or add `Annotated.load_tasks` to your `Rakefile`.
 
 See the [configuration in Rails](#configuration-in-rails) section for more info.
 
@@ -166,7 +166,7 @@ Edit this file to control things like output format, where annotations are
 added (top or bottom of file), and in which artifacts.
 
 The generated rakefile `lib/tasks/auto_annotate_models.rake` also contains
-`Annotate.load_tasks`. This adds a few rake tasks which duplicate command-line
+`Annotated.load_tasks`. This adds a few rake tasks which duplicate command-line
 functionality:
 
     rake annotate_models                          # Add schema information (as comments) to model and fixture files
