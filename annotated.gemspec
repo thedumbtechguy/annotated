@@ -38,7 +38,7 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir.glob(%w[LICENSE.txt *.md *.gemspec bin/* lib/**/*])
   spec.bindir = "bin"
-  spec.executables = ["annotated"]
+  spec.executables = ["annotate"]
   spec.require_paths = ["lib"]
 
   spec.add_dependency "activerecord", ">= 3.2"
