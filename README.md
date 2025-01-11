@@ -1,10 +1,14 @@
-## Annotated (fork of Annotate aka AnnotateModels)
+## Annotated (drop-in fork of Annotate aka AnnotateModels)
 
-[![Gem Version](https://badge.fury.io/rb/annotate.svg)](http://badge.fury.io/rb/annotate)
-[![Downloads count](https://img.shields.io/gem/dt/annotate.svg?style=flat)](https://rubygems.org/gems/annotate)
-[![CI Status](https://github.com/ctran/annotate_models/workflows/CI/badge.svg)](https://github.com/ctran/annotate_models/actions?workflow=CI)
-[![Coveralls](https://coveralls.io/repos/ctran/annotate_models/badge.svg?branch=develop)](https://coveralls.io/r/ctran/annotate_models?branch=develop)
-[![Maintenability](https://codeclimate.com/github/ctran/annotate_models/badges/gpa.svg)](https://codeclimate.com/github/ctran/annotate_models)
+> This is a fork of the [annotate](https://github.com/ctran/annotate_models) gem, created to provide ongoing maintenance and updates while maintaining drop-in compatibility. This fork was created in response to the original gem's maintenance status (see [discussion](https://github.com/ctran/annotate_models/issues/1028)) and serves as an alternative to [annotaterb](https://github.com/drwl/annotaterb) which introduces breaking changes.
+> 
+> Unlike annotaterb, this gem aims to be a direct drop-in replacement for the original annotate gem, allowing users to migrate without any changes to their existing configuration or workflow.
+
+
+[![Gem Version](https://badge.fury.io/rb/annotated.svg)](http://badge.fury.io/rb/annotated)
+[![Downloads count](https://img.shields.io/gem/dt/annotated.svg?style=flat)](https://rubygems.org/gems/annotated)
+[![CI Status](https://github.com/thedumbtechguy/annotated/workflows/CI/badge.svg)](https://github.com/thedumbtechguy/annotated/actions?workflow=CI)
+
 
 Add a comment summarizing the current schema to the top or bottom of each of your...
 
@@ -82,7 +86,7 @@ Into Gemfile from rubygems.org:
 
 ```ruby
 group :development do
-  gem 'annotate'
+  gem 'annotated'
 end
 ```
 
@@ -90,20 +94,15 @@ Into Gemfile from Github:
 
 ```ruby
 group :development do
-  gem 'annotate', git: 'https://github.com/ctran/annotate_models.git'
+  gem 'annotated', git: 'https://github.com/thedumbtechguy/annotated.git'
 end
 ```
 
 Into environment gems from rubygems.org:
 
-    gem install annotate
+    gem install annotated
 
-Into environment gems from Github checkout:
 
-    git clone https://github.com/ctran/annotate_models.git annotate_models
-    cd annotate_models
-    rake gem
-    gem install dist/annotate-*.gem
 
 ## Usage
 
@@ -137,7 +136,7 @@ To remove routes.rb annotations:
     annotate --routes --delete
 
 To automatically annotate every time you run `db:migrate`,
-either run `rails g annotate:install`
+either run `rails g annotated:install`
 or add `Annotated.load_tasks` to your `Rakefile`.
 
 See the [configuration in Rails](#configuration-in-rails) section for more info.
