@@ -1,4 +1,4 @@
-require "annotate"
+require "annotated"
 
 module Annotated
   module Generators
