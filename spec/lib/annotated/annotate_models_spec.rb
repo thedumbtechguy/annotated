@@ -67,7 +67,7 @@ describe AnnotateModels do
       primary_key: primary_key,
       column_names: columns.map { |col| col.name.to_s },
       columns: columns,
-      column_defaults: Hash[columns.map { |col| [col.name, col.default] }],
+      column_defaults: columns.map { |col| [col.name, col.default] }.to_h,
       table_name_prefix: ""
     }
 
@@ -3117,7 +3117,7 @@ describe AnnotateModels do
 
   describe ".annotate_model_file" do
     before do
-      class Foo < ActiveRecord::Base; end
+      class Foo < ActiveRecord::Base; end # standard:disable Lint/ConstantDefinitionInBlock
       allow(AnnotateModels).to receive(:get_model_class).with("foo.rb") { Foo }
       allow(Foo).to receive(:table_exists?) { false }
     end
@@ -3134,7 +3134,7 @@ describe AnnotateModels do
 
     context "with a non-class" do
       before do
-        NotAClass = "foo".freeze # rubocop:disable Naming/ConstantName
+        NotAClass = "foo".freeze # standard:disable Lint/ConstantDefinitionInBlock, Naming/ConstantName
         allow(AnnotateModels).to receive(:get_model_class).with("foo.rb") { NotAClass }
       end
 

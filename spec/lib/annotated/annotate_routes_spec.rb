@@ -2,12 +2,12 @@ require_relative "../../spec_helper"
 require "annotated/annotate_routes"
 
 describe AnnotateRoutes do
-  ROUTE_FILE = "config/routes.rb".freeze
+  ROUTE_FILE = "config/routes.rb".freeze # standard:disable Lint/ConstantDefinitionInBlock
 
-  MESSAGE_ANNOTATED = "#{ROUTE_FILE} was annotated.".freeze
-  MESSAGE_UNCHANGED = "#{ROUTE_FILE} was not changed.".freeze
-  MESSAGE_NOT_FOUND = "#{ROUTE_FILE} could not be found.".freeze
-  MESSAGE_REMOVED = "Annotations were removed from #{ROUTE_FILE}.".freeze
+  MESSAGE_ANNOTATED = "#{ROUTE_FILE} was annotated.".freeze # standard:disable Lint/ConstantDefinitionInBlock
+  MESSAGE_UNCHANGED = "#{ROUTE_FILE} was not changed.".freeze # standard:disable Lint/ConstantDefinitionInBlock
+  MESSAGE_NOT_FOUND = "#{ROUTE_FILE} could not be found.".freeze # standard:disable Lint/ConstantDefinitionInBlock
+  MESSAGE_REMOVED = "Annotations were removed from #{ROUTE_FILE}.".freeze # standard:disable Lint/ConstantDefinitionInBlock
 
   unless const_defined?(:MAGIC_COMMENTS)
     MAGIC_COMMENTS = [

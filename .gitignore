@@ -4,6 +4,7 @@
 .gems
 .rbenv-version
 .ruby-*
+!.ruby-version
 /.idea/
 /.rbx
 /.rvmrc

@@ -145,7 +145,14 @@ module AnnotateModels
       bare_type_allowance = 16
 
       if options[:format_markdown]
-        info << sprintf("# %-#{max_size + md_names_overhead}.#{max_size + md_names_overhead}s | %-#{md_type_allowance}.#{md_type_allowance}s | %s\n", "Name", "Type", "Attributes")
+        info << sprintf(
+          "# %-*.*s | %-*.*s | %s\n",
+          max_size + md_names_overhead, max_size + md_names_overhead,
+          "Name",
+          md_type_allowance, md_type_allowance,
+          "Type",
+          "Attributes"
+        )
 
         info << "# #{"-" * (max_size + md_names_overhead)} | #{"-" * md_type_allowance} | #{"-" * 27}\n"
       end
@@ -179,7 +186,12 @@ module AnnotateModels
         col_comment = cols_meta[col.name][:col_comment]
 
         if options[:format_rdoc]
-          info << sprintf("# %-#{max_size}.#{max_size}s<tt>%s</tt>", "*#{col_name}*::", attrs.unshift(col_type).join(", ")).rstrip + "\n"
+          info << sprintf(
+            "# %-*.*s<tt>%s</tt>",
+            max_size, max_size,
+            "*#{col_name}*::",
+            attrs.unshift(col_type).join(", ")
+          ).rstrip + "\n"
         elsif options[:format_yard]
           info << sprintf("# @!attribute #{col_name}") + "\n"
           ruby_class = (col.respond_to?(:array) && col.array) ? "Array<#{map_col_type_to_ruby_classes(col_type)}>" : map_col_type_to_ruby_classes(col_type)
@@ -187,7 +199,14 @@ module AnnotateModels
         elsif options[:format_markdown]
           name_remainder = max_size - col_name.length - non_ascii_length(col_name)
           type_remainder = (md_type_allowance - 2) - col_type.length
-          info << sprintf("# **`%s`**%#{name_remainder}s | `%s`%#{type_remainder}s | `%s`", col_name, " ", col_type, " ", attrs.join(", ").rstrip).gsub("``", "  ").rstrip + "\n"
+          info << sprintf(
+            "# **`%s`**%*s | `%s`%*s | `%s`",
+            col_name,
+            name_remainder, " ",
+            col_type,
+            type_remainder, " ",
+            attrs.join(", ").rstrip
+          ).gsub("``", "  ").rstrip + "\n"
         elsif with_comments_column
           info << format_default(col_name, max_size, col_type, bare_type_allowance, simple_formatted_attrs, bare_max_attrs_length, col_comment)
         else
@@ -314,7 +333,8 @@ module AnnotateModels
 
     def final_index_string(index, max_size)
       sprintf(
-        "#  %-#{max_size}.#{max_size}s %s%s%s%s",
+        "#  %-*.*s %s%s%s%s",
+        max_size, max_size,
         index.name,
         "(#{index_columns_info(index).join(",")})",
         index_unique_info(index),
@@ -374,7 +394,7 @@ module AnnotateModels
         fk_info << if options[:format_markdown]
           sprintf("# * `%s`%s:\n#     * **`%s`**\n", format_name.call(fk), constraints_info.blank? ? "" : " (_#{constraints_info}_)", ref_info)
         else
-          sprintf("#  %-#{max_size}.#{max_size}s %s %s", format_name.call(fk), "(#{ref_info})", constraints_info).rstrip + "\n"
+          sprintf("#  %-*.*s %s %s", max_size, max_size, format_name.call(fk), "(#{ref_info})", constraints_info).rstrip + "\n"
         end
       end
 
@@ -403,7 +423,7 @@ module AnnotateModels
           cc_info_markdown << sprintf(": `%s`", expression) if expression
           cc_info_markdown << "\n"
         else
-          sprintf("#  %-#{max_size}.#{max_size}s %s", check_constraint.name, expression).rstrip + "\n"
+          sprintf("#  %-*.*s %s", max_size, max_size, check_constraint.name, expression).rstrip + "\n"
         end
       end
 
@@ -434,8 +454,8 @@ module AnnotateModels
       new_header = info_block.match(header_pattern).to_s
 
       column_pattern = /^#[\t ]+[\w\*\.`]+[\t ]+.+$/
-      old_columns = old_header && old_header.scan(column_pattern).sort
-      new_columns = new_header && new_header.scan(column_pattern).sort
+      old_columns = old_header&.scan(column_pattern)&.sort
+      new_columns = new_header&.scan(column_pattern)&.sort
 
       return false if old_columns == new_columns && !options[:force]
 
@@ -647,7 +667,7 @@ module AnnotateModels
         if File.file?(file_path) && Kernel.require(file_path)
           retry
         elsif /\//.match?(model_path)
-          model_path = model_path.split("/")[1..-1].join("/").to_s
+          model_path = model_path.split("/")[1..].join("/").to_s
           retry
         else
           raise
@@ -869,7 +889,7 @@ module AnnotateModels
     end
 
     def non_ascii_length(string)
-      string.to_s.chars.reject(&:ascii_only?).length
+      string.to_s.chars.count { |element| !element.ascii_only? }
     end
 
     def map_col_type_to_ruby_classes(col_type)
@@ -889,7 +909,7 @@ module AnnotateModels
       cols = klass.columns
       cols += translated_columns(klass)
 
-      if ignore_columns = options[:ignore_columns]
+      if (ignore_columns = options[:ignore_columns])
         cols = cols.reject do |col|
           col.name.match(/#{ignore_columns}/)
         end
@@ -969,7 +989,7 @@ module AnnotateModels
       # If the index includes another column, print it too.
       if options[:simple_indexes] && klass.table_exists? # Check out if this column is indexed
         indices = retrieve_indexes_from_table(klass)
-        if indices = indices.select { |ind| ind.columns.include? column.name }
+        if (indices = indices.select { |ind| ind.columns.include? column.name })
           indices.sort_by(&:name).each do |ind|
             next if ind.columns.is_a?(String)
             ind = ind.columns.reject! { |i| i == column.name }
