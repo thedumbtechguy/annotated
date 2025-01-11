@@ -55,31 +55,6 @@ when using `SpatialAdapter`, `PostgisAdapter` or `PostGISAdapter`:
 
 Also, if you pass the `-r` option, it'll annotate `routes.rb` with the output of `rake routes`.
 
-
-## Upgrading to 3.X and annotate models not working?
-
-In versions 2.7.X the annotate gem defaulted to annotating models if no arguments were passed in.
-The annotate gem by default would not allow for routes and models to be annotated together.
-A [change was added in #647](https://github.com/ctran/annotate_models/pull/647).
-You [can read more here](https://github.com/ctran/annotate_models/issues/663).
-
-There are a few ways of fixing this:
-
-- If using CLI explicitly pass in models flag using `--models`
-
-OR
-
-a) Running `rails g annotate:install` will overwrite your defaults with the annotating `models` option set to `'true'`.
-
-b) In `lib/tasks/auto_annotate_models.rake` add the `models` key-value option:
-
-```ruby
-    Annotated.set_defaults(
-      ...
-      'models'                      => 'true',
-      ...
-```
-
 ## Install
 
 Into Gemfile from rubygems.org:
@@ -90,12 +65,10 @@ group :development do
 end
 ```
 
-Into Gemfile from Github:
+Or
 
 ```ruby
-group :development do
-  gem 'annotated', git: 'https://github.com/thedumbtechguy/annotated.git'
-end
+bundle add annotated --group=development
 ```
 
 Into environment gems from rubygems.org:
@@ -106,7 +79,7 @@ Into environment gems from rubygems.org:
 
 ## Usage
 
-(If you used the Gemfile install, prefix the below commands with `bundle exec`.)
+(If you installed globally (`gem install`), you can drop the `bundle exec` prefix)
 
 ### Usage in Rails
 
