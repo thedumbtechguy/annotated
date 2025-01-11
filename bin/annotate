@@ -28,5 +28,5 @@ options = Annotated.setup_options(
 )
 Annotated.eager_load(options) if Annotated::Helpers.include_models?
 
-AnnotatedModels.send(options_result[:target_action], options) if Annotated::Helpers.include_models?
-AnnotatedRoutes.send(options_result[:target_action], options) if Annotated::Helpers.include_routes?
+AnnotateModels.send(options_result[:target_action], options) if Annotated::Helpers.include_models?
+AnnotateRoutes.send(options_result[:target_action], options) if Annotated::Helpers.include_routes?

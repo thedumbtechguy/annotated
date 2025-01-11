@@ -111,29 +111,35 @@ Into environment gems from rubygems.org:
 ### Usage in Rails
 
 To annotate all your models, tests, fixtures, and factories:
-
+```bash
     cd /path/to/app
-    annotate
+    bundle exec annotate
+```
 
 To annotate just your models, tests, and factories:
-
-    annotate --models --exclude fixtures
+```bash
+    bundle exec annotate --models --exclude fixtures
+```
 
 To annotate just your models:
-
-    annotate --models
+```bash
+    bundle exec annotate --models
+```
 
 To annotate routes.rb:
-
-    annotate --routes
+```bash
+    bundle exec annotate --routes
+```
 
 To remove model/test/fixture/factory/serializer annotations:
-
-    annotate --delete
+```bash
+    bundle exec annotate --delete
+```
 
 To remove routes.rb annotations:
-
-    annotate --routes --delete
+```bash
+    bundle exec annotate --routes --delete
+```
 
 To automatically annotate every time you run `db:migrate`,
 either run `rails g annotated:install`
