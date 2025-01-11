@@ -143,5 +143,3 @@ module Annotated
     end
   end
 end
-
-# Annotate = Annotated unless defined?(Annotate)

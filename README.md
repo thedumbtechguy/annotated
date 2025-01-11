@@ -2,7 +2,7 @@
 
 > This is a fork of the [annotate](https://github.com/ctran/annotate_models) gem, created to provide ongoing maintenance and updates while maintaining drop-in compatibility. This fork was created in response to the original gem's maintenance status (see [discussion](https://github.com/ctran/annotate_models/issues/1028)) and serves as an alternative to [annotaterb](https://github.com/drwl/annotaterb) which introduces breaking changes.
 > 
-> Unlike annotaterb, this gem aims to be a direct drop-in replacement for the original annotate gem, allowing users to migrate without any changes to their existing configuration or workflow.
+> Unlike annotaterb, this gem aims to be a direct drop-in replacement for the original annotate gem, allowing users to migrate without any minimal to their existing configuration or workflow.
 
 
 [![Gem Version](https://badge.fury.io/rb/annotated.svg)](http://badge.fury.io/rb/annotated)
