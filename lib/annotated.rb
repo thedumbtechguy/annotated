@@ -143,3 +143,6 @@ module Annotated
     end
   end
 end
+
+# Allow Annotate to refer to Annotated
+Annotate = Annotated unless defined?(Annotate)
