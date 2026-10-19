@@ -2884,6 +2884,138 @@ describe AnnotateModels do
         .to eq("# START\n#{@schema_info}# END\n#{@file_content}")
     end
 
+    describe "with a class comment directly below the annotation" do
+      before do
+        (@model_file_name, @file_content) = write_model "user.rb", <<~EOS
+          # Represents a user.
+          # Has a name.
+          class User < ActiveRecord::Base
+          end
+        EOS
+        annotate_one_file
+        @schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), "== Schema Info")
+      end
+
+      it "should keep the class comment when updating" do
+        annotate_one_file
+        expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
+      end
+
+      it "should keep the class comment when forcing" do
+        annotate_one_file force: true
+        expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
+      end
+
+      it "should keep the class comment when wrapped" do
+        File.binwrite(@model_file_name, @file_content)
+        annotate_one_file wrapper_open: "START", wrapper_close: "END"
+        annotate_one_file wrapper_open: "START", wrapper_close: "END", force: true
+        expect(File.read(@model_file_name))
+          .to eq("# START\n#{@schema_info}# END\n#{@file_content}")
+      end
+
+      it "should keep the class comment when removing" do
+        AnnotateModels.remove_annotation_of_file(@model_file_name)
+        expect(File.read(@model_file_name)).to eq(@file_content)
+      end
+    end
+
+    describe "with no annotation and a class comment" do
+      let(:class_comment) do
+        <<~EOS
+          # Represents a user.
+          #
+          # Has a name.
+        EOS
+      end
+
+      let(:class_body) do
+        <<~EOS
+          class User < ActiveRecord::Base
+          end
+        EOS
+      end
+
+      [{}, {force: true}].each do |options|
+        context "with options #{options}" do
+          it "should add the annotation above the class comment" do
+            write_model "user.rb", "#{class_comment}#{class_body}"
+            annotate_one_file(options.dup)
+            expect(File.read(@model_file_name)).to eq("#{@schema_info}#{class_comment}#{class_body}")
+          end
+
+          it "should add the annotation after magic comments and above the class comment" do
+            write_model "user.rb", "# frozen_string_literal: true\n\n#{class_comment}#{class_body}"
+            annotate_one_file(options.dup)
+            expect(File.read(@model_file_name))
+              .to eq("# frozen_string_literal: true\n\n#{@schema_info}#{class_comment}#{class_body}")
+          end
+
+          it "should add the annotation after the class when position is :after" do
+            write_model "user.rb", "#{class_comment}#{class_body}"
+            annotate_one_file(options.merge(position: :after))
+            expect(File.read(@model_file_name)).to eq("#{class_comment}#{class_body}\n#{@schema_info}")
+          end
+        end
+      end
+    end
+
+    describe "with an existing outdated annotation and a class comment" do
+      let(:old_annotation) do
+        <<~EOS
+          # == Schema Info
+          #
+          # Table name: users
+          #
+          #  id   :integer          not null, primary key
+          #  name :string(50)       not null
+          #
+        EOS
+      end
+
+      let(:class_comment) do
+        <<~EOS
+          # Represents a user.
+          # Has a name.
+        EOS
+      end
+
+      let(:class_body) do
+        <<~EOS
+          class User < ActiveRecord::Base
+          end
+        EOS
+      end
+
+      before do
+        @schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer), mock_column(:email, :string)]), "== Schema Info")
+      end
+
+      [{}, {force: true}].each do |options|
+        context "with options #{options}" do
+          it "should update the annotation and keep a class comment directly below it" do
+            write_model "user.rb", "#{old_annotation}#{class_comment}#{class_body}"
+            annotate_one_file(options.dup)
+            expect(File.read(@model_file_name)).to eq("#{@schema_info}#{class_comment}#{class_body}")
+          end
+
+          it "should update the annotation and keep a class comment separated by a blank line" do
+            write_model "user.rb", "#{old_annotation}\n#{class_comment}#{class_body}"
+            annotate_one_file(options.dup)
+            expected = options[:force] ? "#{@schema_info}#{class_comment}#{class_body}" : "#{@schema_info}\n#{class_comment}#{class_body}"
+            expect(File.read(@model_file_name)).to eq(expected)
+          end
+
+          it "should update the annotation and keep magic comments and the class comment" do
+            write_model "user.rb", "# frozen_string_literal: true\n\n#{old_annotation}#{class_comment}#{class_body}"
+            annotate_one_file(options.dup)
+            expect(File.read(@model_file_name))
+              .to eq("# frozen_string_literal: true\n\n#{@schema_info}#{class_comment}#{class_body}")
+          end
+        end
+      end
+    end
+
     describe "with existing annotation" do
       context "of a foreign key" do
         before do

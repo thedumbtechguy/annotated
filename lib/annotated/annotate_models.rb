@@ -43,10 +43,16 @@ module AnnotateModels
 
   class << self
     def annotate_pattern(options = {})
+      # The annotation body runs up to its closing bare "#" (or "#++" for rdoc) line,
+      # so comments placed directly below it (e.g. class docs) are left alone.
+      body = /(?:(?:#.*\R)*#(?:\+\+)?\R|(?:#.*\R)*)/
+      wrapper_close = options[:wrapper_close] ? /(?:# #{options[:wrapper_close]}.*\R)?/ : //
+      annotation = /\R?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?\R#{body}#{wrapper_close}\R*/
+
       if options[:wrapper_open]
-        return /(?:^(\n|\r\n)?# (?:#{options[:wrapper_open]}).*(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*)|^(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*/
+        return /(?:^\R?# (?:#{options[:wrapper_open]}).*#{annotation})|^#{annotation}/
       end
-      /^(\n|\r\n)?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?(\n|\r\n)(#.*(\n|\r\n))*(\n|\r\n)*/o
+      /^#{annotation}/
     end
 
     def model_dir
