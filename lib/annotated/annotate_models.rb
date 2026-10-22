@@ -15,6 +15,16 @@ module AnnotateModels
 
   SKIP_ANNOTATION_PREFIX = '# -\*- SkipSchemaAnnotations'.freeze
 
+  # A line of an annotation body in any format: a bare "#" (or rdoc's "#--" and
+  # "#++"), an entry indented by two spaces, a section heading, or a markdown,
+  # rdoc or yard column line.
+  ANNOTATION_LINE = /
+    \#(?:--|\+\+)?\R |
+    \#\ {2,}.*\R |
+    \#\ (?:Table\ name:.*|Indexes|Foreign\ Keys|Check\ Constraints|\#{3}\ .*|==\ Schema\ Information\ End)\R |
+    \#\ (?:Name\ +\|.*|-+\ \|.*|\*\*`.*|\*\ `.*|\*.*\*::.*|@!attribute\ .*)\R
+  /x
+
   MATCHED_TYPES = %w[test fixture factory serializer scaffold controller helper].freeze
 
   # Don't show limit (#) on these column types
@@ -43,9 +53,10 @@ module AnnotateModels
 
   class << self
     def annotate_pattern(options = {})
-      # The annotation body runs up to its closing bare "#" (or "#++" for rdoc) line,
-      # so comments placed directly below it (e.g. class docs) are left alone.
-      body = /(?:(?:#.*\R)*#(?:\+\+)?\R|(?:#.*\R)*)/
+      # The annotation body is only the lines the annotator writes, so the first
+      # line of any other comment placed directly below it (e.g. class docs),
+      # even one with its own bare "#" paragraph breaks, ends it.
+      body = /(?:#{ANNOTATION_LINE})*/o
       wrapper_close = options[:wrapper_close] ? /(?:# #{options[:wrapper_close]}.*\R)?/ : //
       annotation = /\R?# (?:#{COMPAT_PREFIX}|#{COMPAT_PREFIX_MD}).*?\R#{body}#{wrapper_close}\R*/
 

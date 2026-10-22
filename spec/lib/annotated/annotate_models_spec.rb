@@ -2920,6 +2920,42 @@ describe AnnotateModels do
       end
     end
 
+    describe "with a multi-paragraph class comment directly below the annotation" do
+      before do
+        (@model_file_name, @file_content) = write_model "user.rb", <<~EOS
+          # Represents a user.
+          #
+          # Has a name.
+          class User < ActiveRecord::Base
+          end
+        EOS
+        annotate_one_file
+        @schema_info = AnnotateModels.get_schema_info(mock_class(:users, :id, [mock_column(:id, :integer)]), "== Schema Info")
+      end
+
+      it "should keep every paragraph when updating" do
+        annotate_one_file force: true
+        expect(File.read(@model_file_name)).to eq("#{@schema_info}#{@file_content}")
+      end
+
+      it "should keep every paragraph when removing" do
+        AnnotateModels.remove_annotation_of_file(@model_file_name)
+        expect(File.read(@model_file_name)).to eq(@file_content)
+      end
+
+      it "should keep every paragraph in rdoc format" do
+        annotate_one_file format_rdoc: true, force: true
+        AnnotateModels.remove_annotation_of_file(@model_file_name)
+        expect(File.read(@model_file_name)).to eq(@file_content)
+      end
+
+      it "should keep every paragraph in markdown format" do
+        annotate_one_file format_markdown: true, force: true
+        AnnotateModels.remove_annotation_of_file(@model_file_name)
+        expect(File.read(@model_file_name)).to eq(@file_content)
+      end
+    end
+
     describe "with no annotation and a class comment" do
       let(:class_comment) do
         <<~EOS
